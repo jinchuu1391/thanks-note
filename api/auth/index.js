@@ -1,0 +1,11 @@
+const express = require("express");
+const auth = express.Router();
+const authController = require("./auth.ctrl");
+
+auth.post("/signup", authController.signup);
+auth.post("/signin", authController.signin);
+auth.post("/signout", authController.signout);
+auth.post("/mypage", authController.mypage);
+auth.patch("/mypage", authController.updateMypage);
+
+module.exports = auth;
