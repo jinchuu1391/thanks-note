@@ -50,5 +50,19 @@ module.exports = {
         response.status(500).send(error);
       });
   },
-  update: (request, response) => {},
+  update: (request, response) => {
+    db.Content.update(
+      {
+        title: request.body.title,
+        content: request.body.content,
+      },
+      { where: { id: request.body.contentId } }
+    )
+      .then((updatedContent) => {
+        response.status(200);
+      })
+      .catch((error) => {
+        response.status(500).send(error);
+      });
+  },
 };
