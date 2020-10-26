@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Content.init(
     {
-      title: DataTypes.STRING,
-      content: DataTypes.TEXT,
+      title: { type: DataTypes.STRING, allowNull: false },
+      content: { type: DataTypes.TEXT, allowNull: false },
       photo_url: DataTypes.TEXT,
       userId: DataTypes.INTEGER,
     },
