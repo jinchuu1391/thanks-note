@@ -1,4 +1,3 @@
-const { response } = require("express");
 const db = require("../../models");
 
 module.exports = {
@@ -58,7 +57,7 @@ module.exports = {
       },
       { where: { id: request.body.contentId } }
     )
-      .then((updatedContent) => {
+      .then((result) => {
         response.status(200);
       })
       .catch((error) => {

@@ -14,6 +14,16 @@ module.exports = {
         response.status(500).send(error);
       });
   },
-  remove: (request, response) => {},
+  remove: (request, response) => {
+    db.Comment.destroy({
+      where: { id: request.body.commentId },
+    })
+      .then((result) => {
+        response.status(204);
+      })
+      .catch((error) => {
+        response.status(500).send(error);
+      });
+  },
   update: (request, response) => {},
 };
