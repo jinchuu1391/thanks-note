@@ -25,5 +25,18 @@ module.exports = {
         response.status(500).send(error);
       });
   },
-  update: (request, response) => {},
+  update: (request, response) => {
+    db.Comment.update(
+      {
+        comment: request.body.comment,
+      },
+      { where: { id: request.body.commentId } }
+    )
+      .then((result) => {
+        response.status(200).send("댓글 수정 성공");
+      })
+      .catch((error) => {
+        response.status(500).send(error);
+      });
+  },
 };
