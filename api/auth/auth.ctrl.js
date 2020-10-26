@@ -1,11 +1,11 @@
 const db = require("../../models");
-const crypto = require("crypto");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const passwordHash = require("../../helper/passwordHash");
+const generateToken = require("../../helper/generateToken");
 
 module.exports = {
   signup: (request, response) => {
-    // username, password, email, profile_photo_url
     const requestBodyKeys = Object.keys(request.body);
     const neccessaryKeys = ["username", "password", "email"];
     for (let i = 0; i < neccessaryKeys.length; i++) {
@@ -19,29 +19,19 @@ module.exports = {
         return response.status(400).send("bad request");
       }
     }
-    const password = request.body.password;
-    const shasum = crypto.createHash("sha512", process.env.SALT);
-    shasum.update(password);
-    paswword = shasum.digest("hex");
 
     db.User.findOrCreate({
       where: { email: request.body.email },
       defaults: {
         username: request.body.username,
-        password: paswword,
+        password: passwordHash(request.body.password),
       },
     })
       .then(([result, created]) => {
         if (!created) {
-          return response.status(409).send("존재하는 아이디 입니다");
+          response.status(409).send("존재하는 아이디 입니다");
         }
-        let token = jwt.sign(
-          {
-            email: request.body.email,
-            id: result.id,
-          },
-          process.env.TOKEN_KEY
-        );
+        const token = generateToken(request.body.email, result.id);
         response.status(201);
         response.cookie("access-token", token, {
           maxAge: 1000 * 60 * 60 * 24,
@@ -50,11 +40,30 @@ module.exports = {
         response.send("회원가입 성공");
       })
       .catch((error) => {
-        return response.status(500).send(error);
+        response.status(500).send(error);
       });
   },
 
-  signin: (request, response) => {},
+  signin: (request, response) => {
+    db.User.findOne({ where: { email: request.body.email } })
+      .then((user) => {
+        if (!user) {
+          response.status(401).send("계정이 없습니다");
+        }
+        if (user.password === passwordHash(request.body.password)) {
+          let token = generateToken(request.body.email, user.id);
+          response.status(200);
+          response.cookie("access-token", token, {
+            maxAge: 1000 * 60 * 60 * 24,
+            httpOnly: true,
+          });
+          response.send("로그인 성공");
+        } else {
+          response.status(401).send("잘못된 정보 입니다");
+        }
+      })
+      .catch((error) => response.status(500).send(error));
+  },
 
   signout: (request, response) => {},
 
