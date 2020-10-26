@@ -39,6 +39,16 @@ module.exports = {
       response.status(200).json({ content: contentInfo })
     );
   },
-  remove: (request, response) => {},
+  remove: (request, response) => {
+    db.Content.destroy({
+      where: { id: request.body.contentId },
+    })
+      .then((result) => {
+        response.status(204);
+      })
+      .catch((error) => {
+        response.status(500).send(error);
+      });
+  },
   update: (request, response) => {},
 };
