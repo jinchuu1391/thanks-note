@@ -89,5 +89,22 @@ module.exports = {
       });
   },
 
-  updateMypage: (request, response) => {},
+  updateMypage: (request, response) => {
+    let hashedPassword = passwordHash(request.body.password);
+    db.User.update(
+      {
+        username: request.body.username,
+        password: hashedPassword,
+      },
+      {
+        where: { id: request.decoded.id },
+      }
+    )
+      .then((result) => {
+        response.status(200).send("내 정보 수정 성공");
+      })
+      .catch((error) => {
+        response.status(500).send(error);
+      });
+  },
 };
