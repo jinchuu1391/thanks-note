@@ -25,7 +25,20 @@ module.exports = {
         response.status(500).send(error);
       });
   },
-  read: (request, response) => {},
+  read: (request, response) => {
+    db.Content.findAll({
+      where: { id: request.params.id },
+      include: [
+        { model: db.User, attributes: ["username", "email"] },
+        {
+          model: db.Comment,
+          include: [{ model: db.User, attributes: ["username", "email"] }],
+        },
+      ],
+    }).then((contentInfo) =>
+      response.status(200).json({ content: contentInfo })
+    );
+  },
   remove: (request, response) => {},
   update: (request, response) => {},
 };
