@@ -65,7 +65,10 @@ module.exports = {
       .catch((error) => response.status(500).send(error));
   },
 
-  signout: (request, response) => {},
+  signout: (request, response) => {
+    response.cookie("access-token");
+    response.status(204).send("로그아웃 성공");
+  },
 
   mypage: (request, response) => {},
 
