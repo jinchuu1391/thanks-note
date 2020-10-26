@@ -5,8 +5,10 @@ const cors = require("cors");
 const authRouter = require("./api/auth");
 const postRouter = require("./api/post");
 const commentRouter = require("./api/comment");
+const cookieParser = require("cookie-parser");
 
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
 app.get("/", (req, res) => {
