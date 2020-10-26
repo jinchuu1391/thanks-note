@@ -70,7 +70,24 @@ module.exports = {
     response.status(204).send("로그아웃 성공");
   },
 
-  mypage: (request, response) => {},
+  mypage: (request, response) => {
+    db.User.findAll({
+      where: { id: request.decoded.id },
+      attributes: ["id", "username", "email"],
+      include: [
+        {
+          model: db.Content,
+          attributes: ["id", "title", "createdAt", "updatedAt"],
+        },
+      ],
+    })
+      .then((userInfo) => {
+        response.status(200).json(userInfo);
+      })
+      .catch((error) => {
+        response.status(500).send(error);
+      });
+  },
 
   updateMypage: (request, response) => {},
 };
