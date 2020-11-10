@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const checkLoggedIn = (request, response, next) => {
   // 토큰을 검증하고 로그인 여부를 확인하는 미들웨어
-  let token = request.cookies["access-token"];
+  const token = request.body["token"];
   if (!token) {
     response.status(401).send("로그인이 필요합니다");
   }

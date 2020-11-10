@@ -6,7 +6,7 @@ const checkLoggedIn = require("../../helper/checkLoggedIn");
 post.get("/", postController.list);
 post.use("/", checkLoggedIn);
 post.post("/", postController.write);
-post.get("/:id", postController.read);
+post.post("/:id", postController.read);
 post.delete("/:id", postController.remove);
 post.patch("/:id", postController.update);
 

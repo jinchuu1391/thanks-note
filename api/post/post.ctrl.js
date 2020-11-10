@@ -16,7 +16,12 @@ module.exports = {
       });
   },
   list: (request, response) => {
-    db.Content.findAll()
+    db.Content.findAll({
+      attributes: ["id", "title", "createdAt"],
+      include: [
+        { model: db.User, attributes: ["username", "profile_photo_url", "id"] },
+      ],
+    })
       .then((allContents) => {
         response.status(200).json(allContents);
       })
@@ -28,7 +33,10 @@ module.exports = {
     db.Content.findAll({
       where: { id: request.params.id },
       include: [
-        { model: db.User, attributes: ["username", "email"] },
+        {
+          model: db.User,
+          attributes: ["username", "email", "profile_photo_url"],
+        },
         {
           model: db.Comment,
           include: [{ model: db.User, attributes: ["username", "email"] }],

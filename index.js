@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = 4000;
 const cors = require("cors");
 const authRouter = require("./api/auth");
 const postRouter = require("./api/post");
@@ -10,7 +10,6 @@ const cookieParser = require("cookie-parser");
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
-
 app.get("/", (req, res) => {
   res.send("hello world!");
 });

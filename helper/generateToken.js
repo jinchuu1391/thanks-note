@@ -7,7 +7,8 @@ function generateToken(mail, id) {
       email: mail,
       id: id,
     },
-    process.env.TOKEN_KEY
+    process.env.TOKEN_KEY,
+    { expiresIn: "7d" }
   );
   return token;
 }
