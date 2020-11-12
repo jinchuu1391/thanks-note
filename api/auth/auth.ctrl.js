@@ -6,7 +6,6 @@ const generateToken = require("../../helper/generateToken");
 
 module.exports = {
   signup: (request, response) => {
-    console.log("1", request.file);
     const requestBodyKeys = Object.keys(request.body);
     const neccessaryKeys = ["username", "password", "email"];
     for (let i = 0; i < neccessaryKeys.length; i++) {
@@ -14,9 +13,9 @@ module.exports = {
         return response.status(400).send("bad request");
       }
     }
-    const requestBodyValues = Object.values(request.body);
-    for (let i = 0; i < requestBodyValues.length; i++) {
-      if (requestBodyValues[i] === "") {
+
+    for (let i = 0; i < neccessaryKeys.length; i++) {
+      if (request.body[neccessaryKeys[i]] === "") {
         return response.status(400).send("bad request");
       }
     }
@@ -26,22 +25,16 @@ module.exports = {
       defaults: {
         username: request.body.username,
         password: passwordHash(request.body.password),
-        profile_photo_url: request.file.location,
+        profile_photo_url: request.file ? request.file.location : null,
+        introduce: request.body.introduce ? request.body.introduce : null,
       },
     })
       .then(([result, created]) => {
         if (!created) {
-          response
-            .status(409)
-            .json({ message: "존재하는 아이디 입니다", code: "409" });
+          response.status(409).send("존재하는 아이디 입니다");
         }
         const token = generateToken(request.body.email, result.id);
         response.status(201).json({ message: "회원가입 성공!", token: token });
-        // response.cookie("access-token", token, {
-        //   maxAge: 1000 * 60 * 60 * 24,
-        //   httpOnly: true,
-        // });
-        // response.send("회원가입 성공");
       })
       .catch((error) => {
         response.status(500).send(error);
@@ -75,7 +68,7 @@ module.exports = {
 
   mypage: (request, response) => {
     db.User.findAll({
-      where: { id: request.decoded.id },
+      where: { email: request.params.email },
       attributes: ["id", "username", "email", "profile_photo_url"],
       include: [
         {

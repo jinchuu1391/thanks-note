@@ -19,7 +19,10 @@ module.exports = {
     db.Content.findAll({
       attributes: ["id", "title", "createdAt"],
       include: [
-        { model: db.User, attributes: ["username", "profile_photo_url", "id"] },
+        {
+          model: db.User,
+          attributes: ["username", "profile_photo_url", "id", "email"],
+        },
       ],
     })
       .then((allContents) => {
