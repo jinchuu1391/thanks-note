@@ -25,16 +25,20 @@ module.exports = {
       defaults: {
         username: request.body.username,
         password: passwordHash(request.body.password),
-        profile_photo_url: request.file ? request.file.location : null,
+        profile_photo_url: request.file
+          ? request.file.location
+          : "https://user-images.githubusercontent.com/62422486/98907760-b282a200-2502-11eb-9e27-acb392842a92.png",
         introduce: request.body.introduce ? request.body.introduce : null,
       },
     })
       .then(([result, created]) => {
         if (!created) {
-          response.status(409).send("존재하는 아이디 입니다");
+          return response.status(409).send("존재하는 아이디 입니다");
         }
         const token = generateToken(request.body.email, result.id);
-        response.status(201).json({ message: "회원가입 성공!", token: token });
+        return response
+          .status(201)
+          .json({ message: "회원가입 성공!", token: token });
       })
       .catch((error) => {
         response.status(500).send(error);
@@ -69,7 +73,7 @@ module.exports = {
   mypage: (request, response) => {
     db.User.findAll({
       where: { email: request.params.email },
-      attributes: ["id", "username", "email", "profile_photo_url"],
+      attributes: ["id", "username", "email", "profile_photo_url", "introduce"],
       include: [
         {
           model: db.Content,

@@ -23,6 +23,10 @@ module.exports = {
           model: db.User,
           attributes: ["username", "profile_photo_url", "id", "email"],
         },
+        {
+          model: db.Comment,
+          attributes: ["id"],
+        },
       ],
     })
       .then((allContents) => {
@@ -42,19 +46,26 @@ module.exports = {
         },
         {
           model: db.Comment,
-          include: [{ model: db.User, attributes: ["username", "email"] }],
+          include: [
+            {
+              model: db.User,
+              attributes: ["username", "email", "profile_photo_url"],
+            },
+          ],
         },
       ],
     }).then((contentInfo) =>
-      response.status(200).json({ content: contentInfo })
+      response
+        .status(200)
+        .json({ content: contentInfo, currentUser: request.decoded.email })
     );
   },
   remove: (request, response) => {
     db.Content.destroy({
-      where: { id: request.body.contentId },
+      where: { id: request.params.id },
     })
       .then((result) => {
-        response.status(204);
+        response.status(204).send("success");
       })
       .catch((error) => {
         response.status(500).send(error);
@@ -66,10 +77,10 @@ module.exports = {
         title: request.body.title,
         content: request.body.content,
       },
-      { where: { id: request.body.contentId } }
+      { where: { id: request.params.id } }
     )
       .then((result) => {
-        response.status(200);
+        response.status(200).send("success");
       })
       .catch((error) => {
         response.status(500).send(error);

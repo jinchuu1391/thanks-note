@@ -19,7 +19,7 @@ module.exports = {
       where: { id: request.body.commentId },
     })
       .then((result) => {
-        response.status(204);
+        response.status(204).send("success");
       })
       .catch((error) => {
         response.status(500).send(error);
