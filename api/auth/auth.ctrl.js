@@ -71,8 +71,12 @@ module.exports = {
   },
 
   mypage: (request, response) => {
-    db.User.findAll({
-      where: { email: request.params.email },
+    db.User.findOne({
+      where: {
+        email: request.params.email
+          ? request.params.email
+          : request.decoded.email,
+      },
       attributes: ["id", "username", "email", "profile_photo_url", "introduce"],
       include: [
         {
@@ -82,7 +86,9 @@ module.exports = {
       ],
     })
       .then((userInfo) => {
-        response.status(200).json(userInfo);
+        response
+          .status(200)
+          .json({ userInfo: userInfo, currentUser: request.decoded.email });
       })
       .catch((error) => {
         response.status(500).send(error);
@@ -90,21 +96,42 @@ module.exports = {
   },
 
   updateMypage: (request, response) => {
-    let hashedPassword = passwordHash(request.body.password);
-    db.User.update(
-      {
-        username: request.body.username,
-        password: hashedPassword,
-      },
-      {
+    const dataToUpdate = {
+      username: request.body.username,
+      introduce: request.body.introduce,
+    };
+    if (request.body.password) {
+      const hashedPassword = passwordHash(request.body.password);
+      const dataToUpdateWithPassword = request.file
+        ? {
+            ...dataToUpdate,
+            password: hashedPassword,
+            profile_photo_url: request.file.location,
+          }
+        : { ...dataToUpdate, password: hashedPassword };
+      db.User.update(dataToUpdateWithPassword, {
         where: { id: request.decoded.id },
-      }
-    )
-      .then((result) => {
-        response.status(200).send("내 정보 수정 성공");
       })
-      .catch((error) => {
-        response.status(500).send(error);
-      });
+        .then((result) => {
+          response.status(200).send("내 정보 수정 성공");
+          return;
+        })
+        .catch((error) => {
+          response.status(500).send(error);
+          return;
+        });
+    } else {
+      db.User.update(dataToUpdate, {
+        where: { id: request.decoded.id },
+      })
+        .then((result) => {
+          response.status(200).send("내 정보 수정 성공");
+          return;
+        })
+        .catch((error) => {
+          response.status(500).send(error);
+          return;
+        });
+    }
   },
 };

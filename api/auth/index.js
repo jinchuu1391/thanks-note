@@ -7,8 +7,12 @@ const upload = require("../../helper/imgUpload");
 auth.post("/signup", upload.single("img"), authController.signup);
 auth.post("/signin", authController.signin);
 auth.post("/signout", authController.signout);
-auth.use("/", checkLoggedIn);
-auth.post("/mypage/:email", authController.mypage);
-auth.patch("/mypage", upload.single("img"), authController.updateMypage);
+auth.post("/mypage/:email", checkLoggedIn, authController.mypage);
+auth.post(
+  "/profileupdate",
+  upload.single("img"),
+  checkLoggedIn,
+  authController.updateMypage
+);
 
 module.exports = auth;
