@@ -8,7 +8,6 @@ const commentRouter = require("./api/comment");
 const cookieParser = require("cookie-parser");
 
 app.use(cors());
-app.use(cookieParser());
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("hello world!");
