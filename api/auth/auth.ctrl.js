@@ -96,12 +96,26 @@ module.exports = {
   },
 
   updateMypage: (request, response) => {
-    const dataToUpdate = {
-      username: request.body.username,
-      introduce: request.body.introduce,
-    };
+    let dataToUpdate;
+    // 기본이미지를 프로필 사진으로 선택했을 경우
+    if (request.body.basicProfile === "true") {
+      dataToUpdate = {
+        username: request.body.username,
+        introduce: request.body.introduce,
+        profile_photo_url:
+          "https://user-images.githubusercontent.com/62422486/98907760-b282a200-2502-11eb-9e27-acb392842a92.png",
+      };
+      // 기본이미지 클릭을 안했을 경우
+    } else {
+      dataToUpdate = {
+        username: request.body.username,
+        introduce: request.body.introduce,
+      };
+    }
+    // 비밀번호를 변경했을 경우
     if (request.body.password) {
       const hashedPassword = passwordHash(request.body.password);
+      // 파일의 존재 여부(이미지 변경 여부)에 따라 분기
       const dataToUpdateWithPassword = request.file
         ? {
             ...dataToUpdate,
@@ -110,7 +124,7 @@ module.exports = {
           }
         : { ...dataToUpdate, password: hashedPassword };
       db.User.update(dataToUpdateWithPassword, {
-        where: { id: request.decoded.id },
+        where: { email: request.decoded.email },
       })
         .then((result) => {
           response.status(200).send("내 정보 수정 성공");
@@ -121,7 +135,10 @@ module.exports = {
           return;
         });
     } else {
-      db.User.update(dataToUpdate, {
+      const dataToUpdateWithoutPassword = request.file
+        ? { ...dataToUpdate, profile_photo_url: request.file.location }
+        : dataToUpdate;
+      db.User.update(dataToUpdateWithoutPassword, {
         where: { id: request.decoded.id },
       })
         .then((result) => {
